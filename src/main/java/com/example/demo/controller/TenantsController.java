@@ -9,6 +9,8 @@ import javax.management.AttributeNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,10 +19,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.entity.TenantJWTResponse;
 import com.example.demo.entity.Tenants;
+import com.example.demo.entity.TenantsVerify;
 import com.example.demo.repository.CommunitiesRepo;
 import com.example.demo.repository.FlatsRepo;
 import com.example.demo.repository.TenantsRepo;
+import com.example.demo.util.JwtUtil;
 
 @RestController
 @CrossOrigin("http://localhost:4200/")
@@ -32,10 +37,10 @@ public class TenantsController {
 	FlatsRepo flatRepo;
 	@Autowired
 	CommunitiesRepo communityRepo;
-//	@Autowired
-//    private AuthenticationManager authenticationManager;
-//    @Autowired
-//    private JwtUtil jwtUtil;
+	@Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtUtil jwtUtil;
 	  @GetMapping("/tenants")
 	    public List < Tenants > getAllFlats() {
 		   System.out.println("inside get request");
@@ -58,7 +63,7 @@ public class TenantsController {
 	        
 	    }
 //	 @PostMapping("/verify-tenant")
-//	    public List<Tenants> createEmployee( @RequestBody tenantsVerify verify) {
+//	    public List<Tenants> createEmployee( @RequestBody TenantsVerify verify) {
 //	             List<Tenants> obj = tenentsRepo.findByPersonName(verify.getName());
 //	              if(obj.get(0).getPassword().equals(verify.getPassword())) {
 //	            	  return obj;
@@ -68,28 +73,28 @@ public class TenantsController {
 //	              }
 //}
 	 //====================================================================================================================
-//	 @PostMapping("/verify-tenant")
-//	    public TenantJWTResponse generateToken(@RequestBody tenantsVerify authRequest) throws Exception {
-//		 
-//	    	 List<Tenants> user = tenentsRepo.findByPersonName(authRequest.getName());
-//	        try {
-//	            authenticationManager.authenticate(
-//	                    new UsernamePasswordAuthenticationToken(authRequest.getName(), authRequest.getPassword())
-//	            );
-//	        } catch (Exception ex) {
-//	            throw new Exception("inavalid username/password");
-//	        }
-//	        TenantJWTResponse response=new TenantJWTResponse();
-//	        String token=jwtUtil.generateToken(authRequest.getName(),user.get(0).getId());
-//	        if(user.get(0).getPassword().equals(authRequest.getPassword())) {
-//          	  response.setUser(user);
-//            }
-//            else {
-//          	  response.setUser(null);
-//            }
-//	       response.setToken(token);
-//	       return response;
-//	    }  //reutrns a list of tenats by name along with jwt token ------------ change josh
+	 @PostMapping("/verify-tenant")
+	    public TenantJWTResponse generateToken(@RequestBody TenantsVerify authRequest) throws Exception {
+		 
+	    	 List<Tenants> user = tenentsRepo.findByPersonName(authRequest.getName());
+	        try {
+	            authenticationManager.authenticate(
+	                    new UsernamePasswordAuthenticationToken(authRequest.getName(), authRequest.getPassword())
+	            );
+	        } catch (Exception ex) {
+	            throw new Exception("inavalid username/password");
+	        }
+	        TenantJWTResponse response=new TenantJWTResponse();
+	        String token=jwtUtil.generateToken(authRequest.getName(),user.get(0).getId());
+	        if(user.get(0).getPassword().equals(authRequest.getPassword())) {
+          	  response.setUser(user);
+            }
+            else {
+          	  response.setUser(null);
+            }
+	       response.setToken(token);
+	       return response;
+	    }  //reutrns a list of tenats by name along with jwt token ------------ change josh
 	 //====================================================================================================================
 	 @PostMapping("/putTenants/{communityId}")
 	  public ResponseEntity<Tenants> AddTenantsByCommunityId(@PathVariable(value = "communityId") Long communityId,

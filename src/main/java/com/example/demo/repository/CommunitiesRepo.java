@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.example.demo.entity.Communities;
-import com.example.demo.entity.Super_user;
 
 @Repository
 public interface CommunitiesRepo extends JpaRepository<Communities, Long>{
