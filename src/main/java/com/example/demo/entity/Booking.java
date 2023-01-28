@@ -27,7 +27,7 @@ public class Booking {
 	public Date	toDate;
 	public String approvedByManager;
 	public String comments;
-	private String createdBy;
+	public String createdBy;
 	private String updatedBy;
 	@CreationTimestamp
 	@Temporal(TemporalType.DATE)

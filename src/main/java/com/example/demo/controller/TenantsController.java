@@ -46,6 +46,11 @@ public class TenantsController {
 		   System.out.println("inside get request");
 	        return tenentsRepo.findAll();
 	    }
+	  @GetMapping("/tenantsByName/{name}")
+	    public List < Tenants > getTenantsByName(@PathVariable(value = "name") String name) {
+		   System.out.println("inside get request");
+	        return tenentsRepo.findByPersonName(name);
+	    }
 
 	 @PostMapping("/putTenants")
 	    public Tenants createFlats( @RequestBody Tenants tenant) {
@@ -159,10 +164,25 @@ public class TenantsController {
 	    }
 	    return new ResponseEntity<>(str, HttpStatus.OK);
 	  }
-	 @PutMapping("/updateTenants/{id}")
-		public ResponseEntity<Tenants> updateTutorial(@PathVariable("id") long id, @RequestBody Tenants expenses) {
+	 @PutMapping("/updateTenants/{id}/{comId}")
+		public ResponseEntity<Tenants> updateTutorial(@PathVariable("id") long id,
+				@PathVariable("comId") long comId,@RequestBody Tenants expenses) {
 			List<Tenants> tutorialData = tenentsRepo.findById(id);
-			if (tutorialData.size()!=0) {
+			List<Tenants> str=tenentsRepo.findByCommunityIdAndPersonName(comId,expenses.personName);
+			
+			if (tutorialData.size()!=0 && str.size()==0) {
+				System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>++++++++++++++++++"+1);
+				Tenants _tutorial = tutorialData.get(0);
+				_tutorial.setFlatId(expenses.flatId);
+				_tutorial.setPersonName(expenses.personName);
+				_tutorial.setEmail(expenses.email);
+				_tutorial.setAdminStartDate(expenses.adminStartDate);
+				_tutorial.setAdminEndDate(expenses.adminEndDate);
+				_tutorial.setPhoneNumber(expenses.phoneNumber);	
+				return new ResponseEntity<>(tenentsRepo.save(_tutorial), HttpStatus.OK);
+			}
+			else if(str.size()!=0 && str.get(0).personName.equals(tutorialData.get(0).personName) ) {
+				System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>++++++++++++++++++"+2);
 				Tenants _tutorial = tutorialData.get(0);
 				_tutorial.setFlatId(expenses.flatId);
 				_tutorial.setPersonName(expenses.personName);
@@ -170,10 +190,10 @@ public class TenantsController {
 				_tutorial.setAdminStartDate(expenses.adminStartDate);
 				_tutorial.setAdminEndDate(expenses.adminEndDate);
 				_tutorial.setPhoneNumber(expenses.phoneNumber);
-				
 				return new ResponseEntity<>(tenentsRepo.save(_tutorial), HttpStatus.OK);
-			} else {
-				return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+			}
+			else {
+				return new ResponseEntity<>(null,HttpStatus.OK);
 			}
 		}
 	 

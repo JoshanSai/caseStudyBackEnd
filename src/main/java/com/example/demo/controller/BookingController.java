@@ -67,11 +67,33 @@ public class BookingController {
 		   System.out.println("inside get request");
 	        return bookingRepo.findByType(Sort.by(Sort.Direction.DESC,"id"),type);
 	    }
+	 //========== approve reject bug
 	 @GetMapping("/status/{id}/{status}")
-	    public Booking  updateEmployee(@PathVariable(value = "id") long id,@PathVariable(value = "status") String status){ 
+	    public List<Date>  updateEmployee(@PathVariable(value = "id") long id,@PathVariable(value = "status") String status){ 
 	        Booking book = bookingRepo.findById(id).get(0);
-	        book.setApprovedByManager(status);
-	       return bookingRepo.save(book);
+	        List<Booking> str =bookingRepo.findByRoomNameAndApprovedByManager(book.roomName, "Approved");
+	        List<Date> str2 = new ArrayList<Date>();
+	        int c=0;
+	        for(int i=0;i<str.size();i++) {
+	        	if( book.fromDate.compareTo(str.get(i).fromDate)>=0 && 
+					    book.fromDate.compareTo(str.get(i).toDate)<=0 || 
+                        book.fromDate.compareTo(str.get(i).fromDate)<=0 && 
+                        book.toDate.compareTo(str.get(i).toDate)>=0) {
+						c=c+1;
+						System.out.print("helooo"+c);
+						str2.add(str.get(i).fromDate);
+						str2.add(str.get(i).toDate);
+					}
+	        }
+	        if(c!=0 && status=="Rejected") {
+				return str2;
+			}
+			else {
+				book.setApprovedByManager(status);
+			      System.out.println("(----------------------------------"+ bookingRepo.save(book));
+				return null;
+			}
+	       
 	    }
 	 @PostMapping("/putBookingF")
 	    public Booking putBookingF( @RequestBody Booking booking) {
@@ -113,6 +135,8 @@ public class BookingController {
 				}
 				List<Booking> str = new ArrayList<Booking>();
 				List<Date> str2 = new ArrayList<Date>();
+				List<Booking> str3= bookingRepo.findByRoomNameAndFromDateAndToDateAndCreatedByAndType(
+						booking.roomName, booking.fromDate, booking.toDate, booking.createdBy, booking.type);
 				str=bookingRepo.findByRoomNameAndApprovedByManager(name,status);
 				for(int i=0;i<str.size();i++) {
 					if( booking.fromDate.compareTo(str.get(i).fromDate)>=0 && 
@@ -125,12 +149,15 @@ public class BookingController {
 						str2.add(str.get(i).toDate);
 					}
 				}
-				if(c!=0) {
+				if(c!=0 ) {
 					return str2;
 				}
-				else {
+				else if(str3.size()==0){
 					 bookingRepo.save(booking);
 					 return null;
+				}
+				else {
+					return str2;
 				}
 		   }
 		 @GetMapping("/allBookings/{type}/{comId}")

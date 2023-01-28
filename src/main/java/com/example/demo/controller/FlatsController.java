@@ -46,14 +46,24 @@ public class FlatsController {
 	@PutMapping("/updateFlats/{id}/")
 	public ResponseEntity<Flats> updateTutorial(@PathVariable("id") long id, @RequestBody Flats expenses) {
 		List<Flats> tutorialData = flatsRepo.findById(id);
-		if (tutorialData.size()!=0) {
+		List<Flats> str=flatsRepo.findByFlatNumber(expenses.flatNumber);
+		System.out.println("---------------000000000-------------"+tutorialData.get(0).flatNumber+expenses.flatNumber);
+		if (tutorialData.size()!=0 && str.size()==0 ) {
 			Flats _tutorial = tutorialData.get(0);
 			_tutorial.setSqft(expenses.Sqft);
 			_tutorial.setFlatNumber(expenses.flatNumber);
 			_tutorial.setNumberOfRooms(expenses.numberOfRooms);
 			return new ResponseEntity<>(flatsRepo.save(_tutorial), HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+		}
+		else if(str.size()!=0 && tutorialData.get(0).flatNumber.equals(expenses.flatNumber)) {
+			Flats _tutorial = tutorialData.get(0);
+			_tutorial.setSqft(expenses.Sqft);
+			_tutorial.setFlatNumber(expenses.flatNumber);
+			_tutorial.setNumberOfRooms(expenses.numberOfRooms);
+			return new ResponseEntity<>(flatsRepo.save(_tutorial), HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<>(null,HttpStatus.OK);
 		}
 	}
 }

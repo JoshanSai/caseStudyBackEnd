@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -47,7 +48,7 @@ public class ExpensesController {
 		   System.out.println("inside get request");
 		   List<Expenses> expenses = new ArrayList<>();
 		   List<Expenses> returningExpenses = new ArrayList<>();
-		   expenses = expensesRepo.findByMonth(month,year);
+		   expenses = expensesRepo.findByMonth(Sort.by(Sort.Direction.ASC,"transactionDate"),month,year);
 		   for (int i = 0; i<expenses.size(); i++) {
 			   if (expenses.get(i).communityId == comId) {
 				   returningExpenses.add(expenses.get(i));
@@ -74,14 +75,10 @@ public class ExpensesController {
 	   @GetMapping("/expensesRange/{from}/{to}/{comId}")
 	    public List < Expenses > getAllExpensesByDateRange(@PathVariable(value = "from") Date from,
 	    		@PathVariable(value = "to") Date to,@PathVariable(value="comId") long comId) {
-		   List<Expenses> expenses = new ArrayList<>();
-	        List<Expenses>str=expensesRepo.findByTransactionDateBetween(from, to);
-	        for(int i=0;i<str.size();i++) {
-	        	if(str.get(i).communityId==comId) {
-	        		expenses.add(str.get(i));
-	        	}
-	        }
-	        return expenses;
+	        List<Expenses>str=expensesRepo.
+             findByCommunityIdAndTransactionDateBetween(Sort.by(Sort.Direction.ASC,"transactionDate"),comId,from, to);
+	        
+	        return str;
 	    }
 	   
 }

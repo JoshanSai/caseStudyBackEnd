@@ -16,5 +16,6 @@ public interface TenantsRepo extends JpaRepository<Tenants, Long>{
 	List<Tenants> findByCommunityId(Long communityId);
 
 	List<Tenants> findById(long id);
+	List<Tenants> findByIdAndPersonName(long id,String name);
 
 }

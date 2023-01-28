@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Sort;
@@ -14,4 +15,7 @@ public interface BookingRepo extends JpaRepository<Booking, Long>{
 	List<Booking> findByType(Sort sort, String type);
 	List<Booking> findById(long id);
 	List<Booking> findByRoomNameAndApprovedByManager(String name,String status);
+	List<Booking> findByRoomNameAndFromDateAndToDateAndCreatedByAndType(String roomName,Date fromDate
+			,Date toDate,String createdBy,String type);
+
 }

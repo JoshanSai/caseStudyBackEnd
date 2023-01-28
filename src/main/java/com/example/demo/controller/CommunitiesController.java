@@ -74,16 +74,17 @@ public class CommunitiesController {
 		   }
 		    @PutMapping("/updateCommunity/{id}")
 			public ResponseEntity<Communities> updateTutorial(@PathVariable("id") long id, @RequestBody Communities expenses) {
-				List<Communities> tutorialData = comRepo.findById(id);
-
-				if (tutorialData.size()!=0) {
+		    	List<Communities> tutorialData=comRepo.findById(id);
+				List<Communities> tutorialData1 = comRepo.findByCommunityNameAndCommunityAddress(expenses.communityName,
+						expenses.communityAddress);
+				if (tutorialData1.size()==0) {
 					Communities _tutorial = tutorialData.get(0);
 					_tutorial.setCommunityName(expenses.communityName);
 					_tutorial.setCommunityAddress(expenses.communityAddress);
 					_tutorial.setRegisteredDate(expenses.registeredDate);
 					return new ResponseEntity<>(comRepo.save(_tutorial), HttpStatus.OK);
 				} else {
-					return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+					return new ResponseEntity<>(null,HttpStatus.OK);
 				}
 			}
 
